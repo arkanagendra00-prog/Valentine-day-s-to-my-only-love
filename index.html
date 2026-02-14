@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valentine Cinematic 💖</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+body{
+margin:0;
+font-family:'Fredoka',sans-serif;
+overflow:hidden;
+background:black;
+color:white;
+transition:1s;
+}
+
+.fade-in{
+animation:fade 2s forwards;
+}
+@keyframes fade{
+from{opacity:0;}
+to{opacity:1;}
+}
+
+.screen{
+position:absolute;
+width:100%;
+height:100%;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+transition:0.7s ease;
+}
+
+.hidden{opacity:0;pointer-events:none;}
+
+.card{
+background:rgba(255,255,255,0.1);
+padding:40px;
+border-radius:30px;
+backdrop-filter:blur(20px);
+box-shadow:0 0 30px #ff4fa3;
+text-align:center;
+}
+
+button{
+padding:12px 25px;
+border:none;
+border-radius:30px;
+background:white;
+color:#ff4fa3;
+font-size:18px;
+cursor:pointer;
+margin:8px;
+transition:0.3s;
+}
+button:hover{transform:scale(1.1);}
+
+.pin-grid{
+display:grid;
+grid-template-columns:repeat(3,80px);
+gap:15px;
+}
+.pin-grid button{
+width:80px;height:80px;border-radius:50%;
+font-size:22px;
+}
+
+.display{
+letter-spacing:15px;
+font-size:30px;
+margin-bottom:20px;
+}
+
+.countdown{
+font-size:100px;
+color:#ff4fa3;
+animation:pulse 1s infinite;
+}
+@keyframes pulse{
+0%{transform:scale(1);}
+50%{transform:scale(1.2);}
+100%{transform:scale(1);}
+}
+
+.heart{
+position:absolute;
+font-size:22px;
+animation:float 6s linear infinite;
+}
+@keyframes float{
+from{transform:translateY(100vh);opacity:1;}
+to{transform:translateY(-10vh);opacity:0;}
+}
+
+</style>
+</head>
+<body>
+
+<audio id="heartbeat">
+<source src="https://cdn.pixabay.com/audio/2022/03/15/audio_9a9b9e0cfa.mp3">
+</audio>
+
+<audio id="bgm" loop>
+<source src="https://cdn.pixabay.com/audio/2022/03/15/audio_5b2a4c1e68.mp3">
+</audio>
+
+<!-- CINEMATIC COUNTDOWN -->
+<div id="opening" class="screen">
+<div class="countdown" id="count">3</div>
+</div>
+
+<!-- LOCK -->
+<div id="lock" class="screen hidden">
+<h2>Enter Love Password 💖</h2>
+<div class="display" id="display"></div>
+<div class="pin-grid">
+<button onclick="press(1)">1</button>
+<button onclick="press(2)">2</button>
+<button onclick="press(3)">3</button>
+<button onclick="press(4)">4</button>
+<button onclick="press(5)">5</button>
+<button onclick="press(6)">6</button>
+<button onclick="press(7)">7</button>
+<button onclick="press(8)">8</button>
+<button onclick="press(9)">9</button>
+<button onclick="clearPin()">⌫</button>
+<button onclick="press(0)">0</button>
+</div>
+</div>
+
+<!-- SLIDES -->
+<div id="slides">
+
+<div class="screen hidden card">
+<h1>Happy Valentine 💕</h1>
+<p>Kamu bikin dunia aku lebih berwarna ✨</p>
+<button onclick="next()">Next</button>
+</div>
+
+<div class="screen hidden card">
+<h1>Fun Fact 💌</h1>
+<p onclick="this.innerHTML='Aku selalu senyum kalau ingat kamu 💖'" style="cursor:pointer;">Klik aku!</p>
+<button onclick="next()">Next</button>
+</div>
+
+<div class="screen hidden card">
+<h1>Mini Game 🎮</h1>
+<p id="gameText">Klik 5x!</p>
+<button onclick="game()">Klik</button>
+<button onclick="next()">Next</button>
+</div>
+
+<div class="screen hidden card">
+<h1>Choose Gift 🎁</h1>
+<button onclick="alert('Coklat buat kamu 🍫')">🍫</button>
+<button onclick="alert('Bunga buat kamu 🌹')">🌹</button>
+<button onclick="next()">Next</button>
+</div>
+
+<div class="screen hidden card">
+<h1>Secret Message 💌</h1>
+<button onclick="this.innerHTML='Aku sayang kamu selamanya 💖'">Open</button>
+<button onclick="next()">Next</button>
+</div>
+
+<div class="screen hidden card">
+<h1>Virtual Hug 🤗</h1>
+<div style="font-size:80px;">💞</div>
+<button onclick="next()">Next</button>
+</div>
+
+<div class="screen hidden card">
+<h1>Will You Be My Valentine? 💘</h1>
+<button onclick="yes()">YES 💖</button>
+<button onclick="run(this)">NO</button>
+</div>
+
+</div>
+
+<script>
+let count=3;
+let countdown=setInterval(()=>{
+count--;
+document.getElementById("count").innerText=count;
+document.getElementById("heartbeat").play();
+if(count===0){
+clearInterval(countdown);
+document.getElementById("opening").classList.add("hidden");
+document.getElementById("lock").classList.remove("hidden");
+}
+},1000);
+
+let input="";
+const correct="010324";
+const display=document.getElementById("display");
+const lock=document.getElementById("lock");
+const screens=document.querySelectorAll("#slides .screen");
+let current=0;
+
+function press(num){
+if(input.length<6){
+input+=num;
+display.innerHTML="• ".repeat(input.length);
+}
+if(input.length===6){
+if(input===correct){
+lock.classList.add("hidden");
+screens[0].classList.remove("hidden");
+document.getElementById("bgm").play();
+hearts();
+}else{
+input="";display.innerHTML="";
+}
+}
+}
+
+function clearPin(){
+input=input.slice(0,-1);
+display.innerHTML="• ".repeat(input.length);
+}
+
+function next(){
+screens[current].classList.add("hidden");
+current++;
+if(current<screens.length){
+screens[current].classList.remove("hidden");
+}
+}
+
+let clickCount=0;
+function game(){
+clickCount++;
+if(clickCount>=5){
+document.getElementById("gameText").innerHTML="You did it 💖";
+}
+}
+
+function run(btn){
+btn.style.position="absolute";
+btn.style.top=Math.random()*80+"%";
+btn.style.left=Math.random()*80+"%";
+}
+
+function yes(){
+confetti({particleCount:300,spread:150});
+alert("YAYYY 💖💖💖");
+}
+
+function hearts(){
+setInterval(()=>{
+let h=document.createElement("div");
+h.className="heart";
+h.style.left=Math.random()*100+"vw";
+h.innerHTML="💖";
+document.body.appendChild(h);
+setTimeout(()=>h.remove(),6000);
+},400);
+}
+</script>
+
+</body>
+</html>
